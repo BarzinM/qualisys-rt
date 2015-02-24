@@ -2,7 +2,6 @@ import socket
 import sys
 import struct
 from lxml import etree
-from time import sleep
 
 
 class body(object):
@@ -19,7 +18,7 @@ class body(object):
 
     def setAll(self, attitude_list):
         if len(attitude_list) != 6:
-            print 'setAll(): Size of array should be 6.'
+            print 'setAll(): Length Of Array Should Be 6.'
             return
         self.linear_x, self.linear_y, self.linear_z,\
             self.angular_x, self.angular_y, self.angular_z = attitude_list
@@ -32,30 +31,28 @@ class QTMClient(object):
 
     """A Client For Qualisys Track Manager.
 
-    Banana banana banana
-
     Example:
         with QTMClient() as qt:
-            qt.connect()
-            qt.getPacket()
-            qt.sendCommand('Version 1.1')
-            qt.getPacket()
+            qt.setup()
+            qt.getAttitude()
+            print qt.getBody(0)['linear_x']
 
     Attributes:
-        sock (socket.socket)
+        bodies (list): An Array Of Body() Objects. Each Object Contain Information Recieved From Qualisys Addressing That Object.
+        sock (socket.socket): Handling The Configurations Of The Connection With Qualisys Track Manager.
+        control (int): A Variable To Check Complete Reception Of Packets.
 
     Public Methods:
-        connect([string ip_address])
-        getPacket()
-        sendCommand(string command)
         getAttitude()
+        sendCommand(string command)
+        setup([string ip_address])
     """
 
     def __enter__(self):
         # Create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.bodies = []
-        self.control=[]
+        self.control = []
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -65,16 +62,18 @@ class QTMClient(object):
             print exc_type, exc_value, traceback
             # return False # uncomment to pass exception through
 
+    def getBody(self, id):
+        return self.bodies[id].getAll()
+
     def getAttitude(self):
-        self.getPacket()
         self.sendCommand('GetCurrentFrame 6DEuler')
 
     def setup(self):
         self.connect()
-        self.sendCommand('Version 1.1')
+        self.sendCommand('Version 1.9')
         self.sendCommand('getparameters 6D')
         if not self.bodies:
-            sys.exit('setup(): No defined bodies were introduced by QTM')
+            sys.exit('setup(): No Defined Bodies Were Introduced By QTM')
 
     def connect(self, ip_address='192.168.0.21'):
         # Connect the socket to the port where the server is listening
@@ -86,7 +85,7 @@ class QTMClient(object):
         if 'QTM RT Interface connected' in response:
             print 'Connetction Established'
         else:
-            sys.exit('Could not connect to Qualisys')
+            sys.exit('Could Not Connect To Qualisys')
 
     def __getHeader(self):
         try:
@@ -109,11 +108,11 @@ class QTMClient(object):
         buf = struct.pack('<I', packet_length) + \
             struct.pack('<I', packet_type) + command
         self.sock.sendall(buf)
-        self.getPacket()
+        self.__getPacket()
 
-    def getPacket(self):
+    def __getPacket(self):
         data_length, packet_type = self.__getHeader()
-        self.control=data_length
+        self.control = data_length
         if data_length is None:
             return
         if packet_type == 0:
@@ -121,9 +120,8 @@ class QTMClient(object):
         elif packet_type == 1:
             self.__displayData(data_length)
         elif packet_type == 2:
-            self.__parseXML(data_length)
+            self.__parseXML()
         elif packet_type == 3:
-            print data_length,'Control var:',self.control
             self.__parseData(data_length)
         elif packet_type == 4:
             self.__parseNoData()
@@ -135,31 +133,26 @@ class QTMClient(object):
             self.__displayData(data_length)
         elif packet_type == 8:
             self.parseFile(data_length)
+        if self.control:
+            print 'Control Var:', self.control
+            sys.exit('Bad Packet Sizing')
 
-
-    def __parseXML(self, data_length):
-        sleep(1)
+    def __parseXML(self):
+        # sleep(1)
         response = ''
-        chunck_limit = 1024
-        while data_length > chunck_limit:
-            response += self.sock.recv(chunck_limit)
-            data_length -= chunck_limit
-        if data_length > 0:
-            response += self.sock.recv(data_length)
-        else:
-            print '!!!!!!!!! fix parseXML in qtm shitforbrains.gif'
+        while self.control > 0:
+            recieved = self.sock.recv(1024)
+            response += recieved
+            self.control -= len(recieved)
         parser = etree.XMLParser(recover=True)
         root = etree.fromstring(response, parser=parser)
         number_of_bodies = root[0][0].text
         number_of_bodies = int(root.find('The_6D').find('Bodies').text)
         self.bodies = [body() for temp in range(number_of_bodies)]
-        print 'Bodies Defined In QTM Project:',
         for i in range(number_of_bodies):
             self.bodies[i].id = i
             self.bodies[i].name = root.find(
                 'The_6D').findall('Body')[i].find('Name').text
-            print self.bodies[i].name,
-        print
 
     def __parseData(self, data_length):
         # print 'Data Packet Length:', data_length
@@ -169,16 +162,13 @@ class QTMClient(object):
         component_count = struct.unpack('<I', data[12:16])[0]
         # print 'Time Stamp Is:', time_stamp
         # print 'Frame Count Is:', frame_number
-        print 'Number Of Components In Data Packet:', component_count
-        self.control -=24
+        self.control -= 16
         bytes_parsed = 16
         for i in range(component_count):
             size_data = data[bytes_parsed:bytes_parsed + 4]
             component_size = struct.unpack('<I', size_data)[0]
-            print "comp size",component_size, 'control var 345',self.control
             type_data = data[bytes_parsed + 4:bytes_parsed + 8]
             component_type = struct.unpack('<I', type_data)[0]
-            print "component_type",component_type
             component_data = data[
                 bytes_parsed + 8:bytes_parsed + component_size]
             # print 'Component Size:', component_size
@@ -191,15 +181,14 @@ class QTMClient(object):
 
     def __sixDofEulerParser(self, data):
         body_count = struct.unpack('<I', data[:4])[0]
-        self.control -=16
+        self.control -= 16
         # drop_rate = struct.unpack('<H', data[4:6])[0]
         # unsync_rate = struct.unpack('<H', data[6:8])[0]
-        print 'Body Count:', body_count
         # print '2D Drop Rate:', drop_rate
         # print '2D Out Of Sync Rate:', unsync_rate
         bytes_parsed = 8
         for i in range(body_count):
-            self.control-=24
+            self.control -= 24
             position_x = struct.unpack(
                 '<f', data[bytes_parsed:bytes_parsed + 4])[0]
             position_y = struct.unpack(
@@ -215,12 +204,12 @@ class QTMClient(object):
             bytes_parsed += 24
             attitude_list = position_x, position_y, position_z, euler_x, euler_y, euler_z
             self.bodies[i].setAll(attitude_list)
-            print(self.bodies[i].getAll()['linear_x'])
-            print 'CV',self.control,'parsed',bytes_parsed
+            print(self.bodies[i].getAll())
         print data[bytes_parsed:]
 
     def __displayData(self, data_length):
         response = self.sock.recv(data_length)
+        self.control -= len(response)
         print response
 
     def __parseNoData(self):
