@@ -18,8 +18,7 @@ class body(object):
 
     def setAll(self, attitude_list):
         if len(attitude_list) != 6:
-            print 'setAll(): Length Of Array Should Be 6.'
-            return
+            sys.exit('setAll(): Length Of Array Should Be 6.')
         self.linear_x, self.linear_y, self.linear_z,\
             self.angular_x, self.angular_y, self.angular_z = attitude_list
 
@@ -38,8 +37,10 @@ class QTMClient(object):
             print qt.getBody(0)['linear_x']
 
     Attributes:
-        bodies (list): An Array Of Body() Objects. Each Object Contain Information Recieved From Qualisys Addressing That Object.
-        sock (socket.socket): Handling The Configurations Of The Connection With Qualisys Track Manager.
+        bodies (list): An Array Of Body() Objects. Each Object Contain
+            Information Recieved From Qualisys Addressing That Object.
+        sock (socket.socket): Handling The Configurations Of The Connection
+            With Qualisys Track Manager.
         control (int): A Variable To Check Complete Reception Of Packets.
 
     Public Methods:
@@ -56,11 +57,12 @@ class QTMClient(object):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        print 'Closing The Connection To QTM RT.'
+        print '\nClosing The Connection To QTM RT.'
         self.sock.close()
-        if exc_type is not None:
+        if exc_type is not None and exc_value[0] is not 0:
             print exc_type, exc_value, traceback
             # return False # uncomment to pass exception through
+        print 'QTM Connection Closed Successfully.'
 
     def getBody(self, id):
         return self.bodies[id].getAll()
@@ -68,8 +70,8 @@ class QTMClient(object):
     def getAttitude(self):
         self.sendCommand('GetCurrentFrame 6DEuler')
 
-    def setup(self):
-        self.connect()
+    def setup(self, ip_address='192.168.0.21'):
+        self.connect(ip_address)
         self.sendCommand('Version 1.9')
         self.sendCommand('getparameters 6D')
         if not self.bodies:
@@ -79,7 +81,11 @@ class QTMClient(object):
         # Connect the socket to the port where the server is listening
         server_address = (ip_address, 22223)
         print >>sys.stderr, 'Connecting To %s Port %s' % server_address
-        self.sock.connect(server_address)
+        try:
+            self.sock.connect(server_address)
+        except socket.error, e:
+            print e, 'Connection Could Not Be Established. \
+            Check Qualisys Server.'
         self.sock.settimeout(3)
         response = self.sock.recv(1024)
         if 'QTM RT Interface connected' in response:
@@ -202,10 +208,9 @@ class QTMClient(object):
             euler_z = struct.unpack(
                 '<f', data[bytes_parsed + 20:bytes_parsed + 24])[0]
             bytes_parsed += 24
-            attitude_list = position_x, position_y, position_z, euler_x, euler_y, euler_z
+            attitude_list = position_x, position_y, position_z, euler_x,\
+                euler_y, euler_z
             self.bodies[i].setAll(attitude_list)
-            print(self.bodies[i].getAll())
-        print data[bytes_parsed:]
 
     def __displayData(self, data_length):
         response = self.sock.recv(data_length)
