@@ -5,7 +5,10 @@ import qtm
 import struct
 import errno
 import inspect
-import time
+import logging
+
+logging.basicConfig(filename='send_to_agents.log', format=50 * '=' +
+                    '\n%(asctime)s %(message)s', level=logging.DEBUG)
 
 
 def lineno():
@@ -25,12 +28,14 @@ class get6D(threading.Thread):
             try:
                 self.qt.getAttitude()
             except socket.error, e:
+                logging.exception(e)
                 if e[0] == errno.EBADF:
                     print 'Qualisys Getting Thread Terminated.'
                 sys.exit(socket.error)
             except Exception, e:
+                logging.exception(e)
                 print 'Line @', lineno(), 'Error in get6D:', e
-                raise e
+                raise
                 sys.exit(e)
             for i in range(self.count):
                 pose_data_buffer = struct.pack('<B', 2)
@@ -70,13 +75,22 @@ class sendToAgent(threading.Thread):
                 self.condition.release()
                 connection.sendall(msg)
         except socket.error, e:
-
             if e[0] == errno.EPIPE:
                 print 'Connection Terminated From Host:', self.peername
+            elif e[0] == errno.ECONNRESET:
+                print 'Connection reset by peer:', self.peername
             else:
-                raise
+                print 'something new happened'
+                logging.exception(e)
+        except IOError, e:
+            if e[0] == errno.EPIPE:
+                print 'The socket has been closed by client.'
         except Exception, e:
+            logging.exception(e)
             print 'Error in sendToAgent():', e
+            raise
+        else:
+            logging.exception(Exception)
 
 
 def getIP():
@@ -127,11 +141,12 @@ with qtm.QTMClient() as qt:
             threads_list[-1].start()
 
         except KeyboardInterrupt, e:
-            print '\nProgram Terminated'
+            print '\nProgram Terminated by User.'
             break
             sys.exit(0)
 
         except Exception, e:
+            logging.exception(e)
             raise
             sys.exit(e)
 

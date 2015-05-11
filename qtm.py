@@ -83,11 +83,11 @@ class QTMClient(object):
         print >>sys.stderr, 'Connecting To %s Port %s' % server_address
         try:
             self.sock.connect(server_address)
+            response = self.sock.recv(1024)
         except socket.error, e:
-            print e, 'Connection Could Not Be Established. \
-            Check Qualisys Server.'
+            print e, '\nConnection Could Not Be Established. Check Qualisys Server.'
+            sys.exit(0)
         self.sock.settimeout(3)
-        response = self.sock.recv(1024)
         if 'QTM RT Interface connected' in response:
             print 'Connetction Established'
         else:
@@ -152,6 +152,9 @@ class QTMClient(object):
             self.control -= len(recieved)
         parser = etree.XMLParser(recover=True)
         root = etree.fromstring(response, parser=parser)
+        if len(root) == 0:
+            print 'XML recieved:\n',response
+            return
         number_of_bodies = root[0][0].text
         number_of_bodies = int(root.find('The_6D').find('Bodies').text)
         self.bodies = [body() for temp in range(number_of_bodies)]
