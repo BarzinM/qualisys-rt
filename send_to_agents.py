@@ -44,6 +44,12 @@ class get6D(threading.Thread):
                 pose_data_buffer += struct.pack('<f',
                                                 self.qt.bodies[i].linear_y)
                 pose_data_buffer += struct.pack('<f',
+                                                self.qt.bodies[i].linear_z)
+                pose_data_buffer += struct.pack('<f',
+                                                self.qt.bodies[i].angular_x)
+                pose_data_buffer += struct.pack('<f',
+                                                self.qt.bodies[i].angular_y)
+                pose_data_buffer += struct.pack('<f',
                                                 self.qt.bodies[i].angular_z)
                 self.condition.acquire()
                 if not messages[i]:

@@ -1,0 +1,12 @@
+==================================================
+2015-07-11 06:19:13,343 timed out
+Traceback (most recent call last):
+  File "send_to_agents.py", line 29, in run
+    self.qt.getAttitude()
+  File "/home/naslab/Barzin/qualisys-rt/qtm.py", line 71, in getAttitude
+    self.sendCommand('GetCurrentFrame 6DEuler')
+  File "/home/naslab/Barzin/qualisys-rt/qtm.py", line 116, in sendCommand
+    self.sock.sendall(buf)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+timeout: timed out
