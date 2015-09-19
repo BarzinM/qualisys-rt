@@ -10,3 +10,57 @@ Traceback (most recent call last):
   File "/usr/lib/python2.7/socket.py", line 224, in meth
     return getattr(self._sock,name)(*args)
 timeout: timed out
+==================================================
+2015-08-05 13:42:57,633 [Errno 113] No route to host
+Traceback (most recent call last):
+  File "send_to_agents.py", line 82, in run
+    connection.sendall(msg)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 113] No route to host
+==================================================
+2015-08-05 16:10:08,353 [Errno 113] No route to host
+Traceback (most recent call last):
+  File "send_to_agents.py", line 82, in run
+    connection.sendall(msg)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 113] No route to host
+==================================================
+2015-08-05 17:21:09,601 [Errno 113] No route to host
+Traceback (most recent call last):
+  File "send_to_agents.py", line 82, in run
+    connection.sendall(msg)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 113] No route to host
+==================================================
+2015-08-05 21:28:56,513 [Errno 113] No route to host
+Traceback (most recent call last):
+  File "send_to_agents.py", line 82, in run
+    connection.sendall(msg)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 113] No route to host
+==================================================
+2015-08-07 22:03:19,489 [Errno 113] No route to host
+Traceback (most recent call last):
+  File "send_to_agents.py", line 82, in run
+    connection.sendall(msg)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 113] No route to host
+==================================================
+2015-08-09 17:20:34,817 [Errno 113] No route to host
+Traceback (most recent call last):
+  File "send_to_agents.py", line 82, in run
+    connection.sendall(msg)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 113] No route to host
+==================================================
+2015-09-07 12:56:14,302 list index out of range
+Traceback (most recent call last):
+  File "send_to_agents.py", line 145, in <module>
+    sendToAgent(connection, messages[agent_id], condition))
+IndexError: list index out of range

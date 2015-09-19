@@ -6,6 +6,8 @@ import struct
 import errno
 import inspect
 import logging
+sys.path.insert(0, '../talki-talki')
+import Talker
 
 logging.basicConfig(filename='send_to_agents.log', format=50 * '=' +
                     '\n%(asctime)s %(message)s', level=logging.DEBUG)
@@ -131,13 +133,27 @@ with qtm.QTMClient() as qt:
     sock.listen(4)
     threads_list = []
     connections_list = []
+    talker = Talker.Talker()
     while True:
         try:
             # Accepting connections from agents
             print 'Waiting For Connection.'
+            talker.say('Waiting for connection.')
+
             connection, address = sock.accept()
             agent_id = int(connection.getpeername()[0][8])
             print connection.getpeername(), 'ID:', agent_id, 'connected'
+
+
+
+
+            agent_id = 0 # SHOULD BE REMOVED LATER
+            print 'number of bodies sent by qualisys: ', len(messages)
+            
+
+
+
+
             connections_list.append(connection)
 
             # Starting a new thread for each new connection
