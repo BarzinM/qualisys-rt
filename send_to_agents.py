@@ -6,8 +6,6 @@ import struct
 import errno
 import inspect
 import logging
-sys.path.insert(0, '../talki-talki')
-import Talker
 
 logging.basicConfig(filename='send_to_agents.log', format=50 * '=' +
                     '\n%(asctime)s %(message)s', level=logging.DEBUG)
@@ -19,9 +17,9 @@ def lineno():
 
 class get6D(threading.Thread):
 
-    def __init__(self, qtm_obj, messages,  condition):
+    def __init__(self, qtm_obj):
         threading.Thread.__init__(self)
-        self.condition = condition
+        # self.condition = condition
         self.qt = qtm_obj
         self.count = len(self.qt.bodies)
 
@@ -39,8 +37,9 @@ class get6D(threading.Thread):
                 print 'Line @', lineno(), 'Error in get6D:', e
                 raise
                 sys.exit(e)
+            # print '--------------------'
+            pose_data_buffer = struct.pack('<B', 2)
             for i in range(self.count):
-                pose_data_buffer = struct.pack('<B', 2)
                 pose_data_buffer += struct.pack('<f',
                                                 self.qt.bodies[i].linear_x)
                 pose_data_buffer += struct.pack('<f',
@@ -53,35 +52,42 @@ class get6D(threading.Thread):
                                                 self.qt.bodies[i].angular_y)
                 pose_data_buffer += struct.pack('<f',
                                                 self.qt.bodies[i].angular_z)
-                self.condition.acquire()
+            for i in range(self.count):
+                conditions.acquire()
                 if not messages[i]:
-                    messages[i].append(pose_data_buffer)
-                self.condition.notify()
-                self.condition.release()
+                    messages[i] = pose_data_buffer
+                # if self.qt.bodies[i].linear_x!=struct.unpack('<f', pose_data_buffer[1:5])[0]:
+                #     print ' found one'
+                # print i, self.qt.bodies[i].angular_x, self.qt.bodies[i].angular_z
+                conditions.notify()
+                conditions.release()
 
 
 class sendToAgent(threading.Thread):
 
-    def __init__(self, connection, msg, condition):
+    def __init__(self, index):
         threading.Thread.__init__(self)
-        self.connection = connection
-        self.msg = msg
-        self.condition = condition
-        self.peername = self.connection.getpeername()
-        connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        # self.connection = connection
+        self.index = index
+        # messages = msg
+        # self.conditions = conditions
+        self.peername = connections_list[index].getpeername()
+        connections_list[index].setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     def run(self):
         try:
             while True:
-                self.condition.acquire()
+                conditions.acquire()
                 while True:
-                    if self.msg:
-                        msg = self.msg.pop()
+                    if messages[self.index]:
+                        msg = messages[self.index]
+                        messages[self.index] = []
+                        print self.index, struct.unpack('<f', msg[1:5])[0]
                         break
-                    self.condition.wait()
+                    conditions.wait()
 
-                self.condition.release()
-                connection.sendall(msg)
+                conditions.release()
+                connections_list[self.index].sendall(msg)
         except socket.error, e:
             if e[0] == errno.EPIPE:
                 print 'Connection Terminated From Host:', self.peername
@@ -123,42 +129,33 @@ with qtm.QTMClient() as qt:
     sock.bind(server_address)
 
     # Setting up recieving thread
-    condition = threading.Condition()
-    messages = [[] for i in range(number_of_bodies)]
-    reciever = get6D(qt, messages, condition)
+    conditions = threading.Condition()
+    messages = [[]] * 4
+    reciever = get6D(qt)
     reciever.daemon = True
     reciever.start()
 
     # Initialization for connection threads
     sock.listen(4)
     threads_list = []
-    connections_list = []
-    talker = Talker.Talker()
+    connections_list = [[]] * 4
     while True:
         try:
             # Accepting connections from agents
             print 'Waiting For Connection.'
-            talker.say('Waiting for connection.')
 
             connection, address = sock.accept()
-            agent_id = int(connection.getpeername()[0][8])
-            print connection.getpeername(), 'ID:', agent_id, 'connected'
+            agent_id = int(connection.getpeername()[0][8]) - 1
+            print connection.getpeername(), 'ID:', agent_id + 1, 'connected'
 
+            # agent_id = 0 # SHOULD BE REMOVED LATER
+            # print 'number of bodies sent by qualisys: ', len(messages)
 
-
-
-            agent_id = 0 # SHOULD BE REMOVED LATER
-            print 'number of bodies sent by qualisys: ', len(messages)
-            
-
-
-
-
-            connections_list.append(connection)
+            print 'agent id:', agent_id, 'connections list:', connections_list
+            connections_list[agent_id] = connection
 
             # Starting a new thread for each new connection
-            threads_list.append(
-                sendToAgent(connection, messages[agent_id], condition))
+            threads_list.append(sendToAgent(agent_id))
             threads_list[-1].daemon = True
             threads_list[-1].start()
 
