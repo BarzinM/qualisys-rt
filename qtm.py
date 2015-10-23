@@ -214,6 +214,7 @@ class QTMClient(object):
             attitude_list = position_x, position_y, position_z, euler_x,\
                 euler_y, euler_z
             self.bodies[i].setAll(attitude_list)
+            # print self.bodies[i].getAll()
 
     def __displayData(self, data_length):
         response = self.sock.recv(data_length)
