@@ -216,3 +216,257 @@ Traceback (most recent call last):
   File "/usr/lib/python2.7/socket.py", line 224, in meth
     return getattr(self._sock,name)(*args)
 error: [Errno 113] No route to host
+==================================================
+2015-10-23 19:38:07,391 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 124, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:38:07,391 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 124, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:38:42,166 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 125, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:38:42,166 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 125, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:39:08,567 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 125, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:39:08,567 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 125, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:40:49,717 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 125, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:40:49,717 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 125, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:41:42,075 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 125, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:41:42,075 list indices must be integers, not str
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 125, in sendLocation
+    with self.conditions[agent_id] as cond:
+TypeError: list indices must be integers, not str
+==================================================
+2015-10-23 19:42:31,008 'bool' object has no attribute 'wait'
+Traceback (most recent call last):
+  File "send_to_agents.py", line 126, in sendLocation
+    cond.wait()
+AttributeError: 'bool' object has no attribute 'wait'
+==================================================
+2015-10-23 19:42:31,008 'bool' object has no attribute 'wait'
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 126, in sendLocation
+    cond.wait()
+AttributeError: 'bool' object has no attribute 'wait'
+==================================================
+2015-10-23 19:42:52,259 'bool' object has no attribute 'wait'
+Traceback (most recent call last):
+  File "send_to_agents.py", line 126, in sendLocation
+    cond.wait()
+AttributeError: 'bool' object has no attribute 'wait'
+==================================================
+2015-10-23 19:42:52,259 'bool' object has no attribute 'wait'
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 126, in sendLocation
+    cond.wait()
+AttributeError: 'bool' object has no attribute 'wait'
+==================================================
+2015-10-23 19:43:38,342 must be convertible to a buffer, not body
+Traceback (most recent call last):
+  File "send_to_agents.py", line 138, in sendLocation
+    connection.sendall(msg)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+TypeError: must be convertible to a buffer, not body
+==================================================
+2015-10-23 19:43:38,342 must be convertible to a buffer, not body
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 138, in sendLocation
+    connection.sendall(msg)
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+TypeError: must be convertible to a buffer, not body
+==================================================
+2015-10-23 19:56:55,214 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 123, in sendLocation
+    agent_id = int(connection.recv(1))
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 19:56:55,214 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 123, in sendLocation
+    agent_id = int(connection.recv(1))
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 19:58:42,431 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 123, in sendLocation
+    agent_id = int(connection.recv(1))
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 19:58:42,431 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 123, in sendLocation
+    agent_id = int(connection.recv(1))
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 19:59:47,130 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 19:59:47,130 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:02:33,148 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:02:33,148 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:03:02,228 'NoneType' object has no attribute 'daemon'
+Traceback (most recent call last):
+  File "send_to_agents.py", line 61, in run
+    threads_list[-1].daemon = True
+AttributeError: 'NoneType' object has no attribute 'daemon'
+==================================================
+2015-10-23 20:03:43,607 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:03:43,607 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:16:16,279 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:16:16,279 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:18:19,097 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:18:19,097 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 124, in sendLocation
+    agent_id = int(agent_id)
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:20:20,134 'NoneType' object has no attribute 'daemon'
+Traceback (most recent call last):
+  File "send_to_agents.py", line 61, in run
+    threads_list[-1].daemon = True
+AttributeError: 'NoneType' object has no attribute 'daemon'
+==================================================
+2015-10-23 20:49:29,915 invalid literal for int() with base 10: ''
+Traceback (most recent call last):
+  File "send_to_agents.py", line 59, in run
+    threads_list.append(self.sendLocation(connection))
+  File "send_to_agents.py", line 95, in sendLocation
+    body_id = int(connection.recv(1))
+ValueError: invalid literal for int() with base 10: ''
+==================================================
+2015-10-23 20:50:32,551 'NoneType' object has no attribute 'daemon'
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list[-1].daemon = True
+AttributeError: 'NoneType' object has no attribute 'daemon'
+==================================================
+2015-10-23 20:53:24,249 [Errno 107] Transport endpoint is not connected
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(threading.Thread(name='sender'+connection.getpeername(), target=self.sendLocation))
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 107] Transport endpoint is not connected
+==================================================
+2015-10-23 20:58:31,583 cannot concatenate 'str' and 'tuple' objects
+Traceback (most recent call last):
+  File "send_to_agents.py", line 60, in run
+    threads_list.append(threading.Thread(name='sender'+connection.getpeername(), target=self.sendLocation))
+TypeError: cannot concatenate 'str' and 'tuple' objects

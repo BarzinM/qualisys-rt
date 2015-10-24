@@ -22,6 +22,27 @@ class body(object):
         self.linear_x, self.linear_y, self.linear_z,\
             self.angular_x, self.angular_y, self.angular_z = attitude_list
 
+    def pack(self):
+        packed_buffer = struct.pack('<B', self.id)
+        packed_buffer += struct.pack('<f', self.linear_x)
+        packed_buffer += struct.pack('<f', self.linear_y)
+        packed_buffer += struct.pack('<f', self.linear_z)
+        packed_buffer += struct.pack('<f', self.angular_x)
+        packed_buffer += struct.pack('<f', self.angular_y)
+        packed_buffer += struct.pack('<f', self.angular_z)
+        return packed_buffer
+
+    def unpack(self, packed_buffer):
+        agent_id = struct.unpack('<B', packed_buffer[:1])[0]
+        x = struct.unpack('<f', packed_buffer[1:5])[0]
+        y = struct.unpack('<f', packed_buffer[5:9])[0]
+        z = struct.unpack('<f', packed_buffer[9:13])[0]
+        yaw = struct.unpack('<f', packed_buffer[13:17])[0] * self.degree_to_rad
+        pitch = struct.unpack('<f', packed_buffer[17:21])[0]
+        roll = struct.unpack('<f', packed_buffer[21:25])[0]
+        return agent_id, x, y, z, yaw, pitch, roll
+        # print num, pose_msg_theta
+
     def getAll(self):
         return self.__dict__
 
@@ -48,6 +69,11 @@ class QTMClient(object):
         sendCommand(string command)
         setup([string ip_address])
     """
+
+    def __init__(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.bodies = []
+        self.control = []
 
     def __enter__(self):
         # Create a TCP/IP socket
@@ -153,7 +179,7 @@ class QTMClient(object):
         parser = etree.XMLParser(recover=True)
         root = etree.fromstring(response, parser=parser)
         if len(root) == 0:
-            print 'XML recieved:\n',response
+            print 'XML recieved:\n', response
             return
         number_of_bodies = root[0][0].text
         number_of_bodies = int(root.find('The_6D').find('Bodies').text)
