@@ -21,7 +21,7 @@ def getIP():
     return ip_address
 
 
-class QualisysNav(object):
+class QualisysLocalizer(object):
 
     def __init__(self, number_of_bodies):
         self.qt = qtm.QTMClient()
@@ -48,6 +48,7 @@ class QualisysNav(object):
         reciever.start()
         while True:
             try:
+                print '------------------------------------------------'
                 print 'Waiting For Connection.'
                 connection, address = sock.accept()
                 print connection.getpeername(), 'connected'
@@ -56,7 +57,7 @@ class QualisysNav(object):
                 thrd = threading.Thread(target=self.sendLocation, args=(connection,))
                 thrd.daemon = True
                 thrd.start()
-                print 'Number of running threads:',threading.activeCount()
+                print 'Number of running threads:', threading.activeCount()
 
             except KeyboardInterrupt, e:
                 print '\nProgram Terminated by User.'
@@ -194,7 +195,7 @@ class sendToAgent(threading.Thread):
             logging.exception(Exception)
 
 if __name__ == '__main__':
-    nav = QualisysNav(4)
+    nav = QualisysLocalizer(5)
     nav.run()
 
 

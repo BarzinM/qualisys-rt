@@ -2,6 +2,9 @@ import socket
 import sys
 import struct
 from lxml import etree
+from numpy import pi
+
+degree_to_rad = pi / 180
 
 
 class body(object):
@@ -37,7 +40,7 @@ class body(object):
         x = struct.unpack('<f', packed_buffer[1:5])[0]
         y = struct.unpack('<f', packed_buffer[5:9])[0]
         z = struct.unpack('<f', packed_buffer[9:13])[0]
-        yaw = struct.unpack('<f', packed_buffer[13:17])[0] * self.degree_to_rad
+        yaw = struct.unpack('<f', packed_buffer[13:17])[0]
         pitch = struct.unpack('<f', packed_buffer[17:21])[0]
         roll = struct.unpack('<f', packed_buffer[21:25])[0]
         return agent_id, x, y, z, yaw, pitch, roll
@@ -120,19 +123,22 @@ class QTMClient(object):
             sys.exit('Could Not Connect To Qualisys')
 
     def __getHeader(self):
-        try:
-            data = self.sock.recv(8)
-            packet_length = struct.unpack('<I', data[:4])[0]
-            packet_type = struct.unpack('<I', data[4:])[0]
-            # print 'Packet Length:', packet_length
-            # print 'Packet Type:', packet_type
-            return packet_length - 8, packet_type
-        except socket.timeout:
-            print 'Connection Timed Out: No Buffer To Read'
-            return None, None
-        except Exception, e:
-            print '!!!!!!!!! Hey! Fix This ->', e
-            sys.exit(e)
+        while True:
+            try:
+                data = self.sock.recv(8)
+                packet_length = struct.unpack('<I', data[:4])[0]
+                packet_type = struct.unpack('<I', data[4:])[0]
+                # print 'Packet Length:', packet_length
+                # print 'Packet Type:', packet_type
+                return packet_length - 8, packet_type
+            except socket.timeout:
+                print 'Connection Timed Out: No Buffer To Read'
+                continue
+            except Exception, e:
+                print '!!!!!!!!! Hey! Fix This ->'
+                raise
+                sys.exit(e)
+            break
 
     def sendCommand(self, command):
         packet_length = 8 + len(command)
@@ -225,17 +231,17 @@ class QTMClient(object):
         for i in range(body_count):
             self.control -= 24
             position_x = struct.unpack(
-                '<f', data[bytes_parsed:bytes_parsed + 4])[0]
+                '<f', data[bytes_parsed:bytes_parsed + 4])[0] / 1000
             position_y = struct.unpack(
-                '<f', data[bytes_parsed + 4:bytes_parsed + 8])[0]
+                '<f', data[bytes_parsed + 4:bytes_parsed + 8])[0] / 1000
             position_z = struct.unpack(
-                '<f', data[bytes_parsed + 8:bytes_parsed + 12])[0]
+                '<f', data[bytes_parsed + 8:bytes_parsed + 12])[0] / 1000
             euler_x = struct.unpack(
-                '<f', data[bytes_parsed + 12:bytes_parsed + 16])[0]
+                '<f', data[bytes_parsed + 12:bytes_parsed + 16])[0] * degree_to_rad
             euler_y = struct.unpack(
-                '<f', data[bytes_parsed + 16:bytes_parsed + 20])[0]
+                '<f', data[bytes_parsed + 16:bytes_parsed + 20])[0] * degree_to_rad
             euler_z = struct.unpack(
-                '<f', data[bytes_parsed + 20:bytes_parsed + 24])[0]
+                '<f', data[bytes_parsed + 20:bytes_parsed + 24])[0] * degree_to_rad
             bytes_parsed += 24
             attitude_list = position_x, position_y, position_z, euler_x,\
                 euler_y, euler_z
