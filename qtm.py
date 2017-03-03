@@ -44,7 +44,6 @@ class body(object):
         pitch = struct.unpack('<f', packed_buffer[17:21])[0]
         roll = struct.unpack('<f', packed_buffer[21:25])[0]
         return agent_id, x, y, z, yaw, pitch, roll
-        # print num, pose_msg_theta
 
     def getAll(self):
         return self.__dict__
@@ -90,7 +89,6 @@ class QTMClient(object):
         self.sock.close()
         if exc_type is not None and exc_value[0] is not 0:
             print exc_type, exc_value, traceback
-            # return False # uncomment to pass exception through
         print 'QTM Connection Closed Successfully.'
 
     def getBody(self, id):
@@ -128,8 +126,6 @@ class QTMClient(object):
                 data = self.sock.recv(8)
                 packet_length = struct.unpack('<I', data[:4])[0]
                 packet_type = struct.unpack('<I', data[4:])[0]
-                # print 'Packet Length:', packet_length
-                # print 'Packet Type:', packet_type
                 return packet_length - 8, packet_type
             except socket.timeout:
                 print 'Connection Timed Out: No Buffer To Read'
@@ -176,7 +172,6 @@ class QTMClient(object):
             sys.exit('Bad Packet Sizing')
 
     def __parseXML(self):
-        # sleep(1)
         response = ''
         while self.control > 0:
             recieved = self.sock.recv(1024)
@@ -196,13 +191,8 @@ class QTMClient(object):
                 'The_6D').findall('Body')[i].find('Name').text
 
     def __parseData(self, data_length):
-        # print 'Data Packet Length:', data_length
         data = self.sock.recv(data_length)
-        # time_stamp = struct.unpack('<Q', data[:8])[0]
-        # frame_number = struct.unpack('<I', data[8:12])[0]
         component_count = struct.unpack('<I', data[12:16])[0]
-        # print 'Time Stamp Is:', time_stamp
-        # print 'Frame Count Is:', frame_number
         self.control -= 16
         bytes_parsed = 16
         for i in range(component_count):
@@ -212,8 +202,6 @@ class QTMClient(object):
             component_type = struct.unpack('<I', type_data)[0]
             component_data = data[
                 bytes_parsed + 8:bytes_parsed + component_size]
-            # print 'Component Size:', component_size
-            # print 'Component Type:', component_type
             if component_type == 6:
                 self.__sixDofEulerParser(component_data)
             else:
@@ -223,10 +211,6 @@ class QTMClient(object):
     def __sixDofEulerParser(self, data):
         body_count = struct.unpack('<I', data[:4])[0]
         self.control -= 16
-        # drop_rate = struct.unpack('<H', data[4:6])[0]
-        # unsync_rate = struct.unpack('<H', data[6:8])[0]
-        # print '2D Drop Rate:', drop_rate
-        # print '2D Out Of Sync Rate:', unsync_rate
         bytes_parsed = 8
         for i in range(body_count):
             self.control -= 24
@@ -246,7 +230,6 @@ class QTMClient(object):
             attitude_list = position_x, position_y, position_z, euler_x,\
                 euler_y, euler_z
             self.bodies[i].setAll(attitude_list)
-            # print self.bodies[i].getAll()
 
     def __displayData(self, data_length):
         response = self.sock.recv(data_length)
