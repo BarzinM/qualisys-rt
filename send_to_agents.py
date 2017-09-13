@@ -4,7 +4,6 @@ import sys
 import threading
 import qtm
 import errno
-import inspect
 import logging
 
 logging.basicConfig(filename='send_to_agents.log', format=50 * '=' +
@@ -23,11 +22,9 @@ def getIP():
 
 class QualisysLocalizer(object):
 
-    def __init__(self, ip, number_of_bodies):
+    def __init__(self, ip):
         self.qt = qtm.QTMClient(ip)
         self.number_of_bodies = self.qt.number_of_bodies
-        # self.messages = [qtm.Body()] * number_of_bodies
-        # self.conditions = [threading.Lock()] * number_of_bodies
 
     def run(self):
         # Setting up server
@@ -47,7 +44,8 @@ class QualisysLocalizer(object):
         while True:
             try:
                 connection, address = sock.accept()
-                print('Connection #%i to %s.'%(threading.activeCount()-1,connection.getpeername()[0]))
+                print('Connection #%i to %s.' %
+                      (threading.activeCount() - 1, connection.getpeername()[0]))
 
                 # setup a new thread for sending to a new agent
                 thrd = threading.Thread(
@@ -75,9 +73,6 @@ class QualisysLocalizer(object):
             except Exception as e:
                 logging.exception(e)
                 raise
-            # for i in range(self.number_of_bodies):
-            #     with self.conditions[i]:
-            #         self.messages[i] = self.qt.bodies[i]
 
     def sendLocation(self, connection):
         # connection configuration
@@ -92,25 +87,23 @@ class QualisysLocalizer(object):
                 msg = self.qt.bodies[body_id].pack()
                 connection.sendall(msg)
         except ValueError as e:
-            print('Connection to %s terminated!'% self.peername[0],end=' ')
+            print('Connection to %s terminated!' % self.peername[0], end=' ')
         except Exception as e:
             logging.exception(e)
             if e[0] == errno.EHOSTUNREACH:
-                print('Connection to %s interrupted!' % self.peername[0],end=' ')
+                print('Connection to %s interrupted!' %
+                      self.peername[0], end=' ')
             elif e[0] == errno.ECONNRESET:
-                print('Connection to %s terminated!'% self.peername[0],end=' ')
+                print('Connection to %s terminated!' %
+                      self.peername[0], end=' ')
             else:
                 raise
-        print("%i left."%(threading.active_count()-3))
-
-
-def lineno():
-    return inspect.currentframe().f_back.f_lineno
+        print("%i left." % (threading.active_count() - 3))
 
 
 if __name__ == '__main__':
     try:
-        nav = QualisysLocalizer('192.168.0.21', 4)
+        nav = QualisysLocalizer('192.168.0.21')
     except KeyboardInterrupt as e:
         print('\nInitialization Incomplete! Exiting ...')
         sys.exit(e)
